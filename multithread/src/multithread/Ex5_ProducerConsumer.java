@@ -3,13 +3,18 @@ package multithread;
 import java.util.ArrayList;
 import java.util.List;
 
+//This a synchronized wait and notify solution for classical producer-consumer problem
+
 class Processor {
 	private List<Integer> list = new ArrayList<>();
-	private final int LIMIT = 5;
+	private final int LIMIT = 50;
 	private final int BOTTOM = 0;
 	private final Object lock = new Object();
 	private int value = 0;
 
+	// This method produces up to LIMIT and when it reaches to LIMIT goes to wait
+	// state
+	// By the way consumer thread runs concurrently
 	public void produce() throws InterruptedException {
 		synchronized (lock) {
 			while (true) {
@@ -22,12 +27,15 @@ class Processor {
 					value++;
 					lock.notify();
 				}
-				Thread.sleep(1000);
+				Thread.sleep(100);
 			}
 
 		}
 	}
 
+	// This method produces up to BOTTOM and when it reaches to BOTTOM goes to wait
+	// state
+	// By the way consumer thread runs concurrently
 	public void consume() throws InterruptedException {
 		synchronized (lock) {
 			while (true) {
@@ -38,16 +46,18 @@ class Processor {
 					System.out.println("removed : " + list.remove(--value));
 					lock.notify();
 				}
-				Thread.sleep(1000);
+				Thread.sleep(100);
 			}
-			
 
 		}
 
 	}
 }
 
-public class ProducerConsumer {
+
+
+
+public class Ex5_ProducerConsumer {
 
 	public static void main(String[] args) {
 
@@ -73,6 +83,9 @@ public class ProducerConsumer {
 			}
 		});
 
+		// These two threads increment and decrement counter same time however it never
+		// reaches bottom and limit values.
+		// BUT THANKS TO LOCK, THEY WAIT FOR EACH OTHER
 		t1.start();
 		t2.start();
 
